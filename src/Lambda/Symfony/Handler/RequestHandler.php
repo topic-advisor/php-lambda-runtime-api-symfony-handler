@@ -1,6 +1,6 @@
 <?php
 
-namespace TopicAdvisor\Lambda\Symfony\Handler\Http;
+namespace TopicAdvisor\Lambda\Symfony\Handler;
 
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,9 +10,8 @@ use TopicAdvisor\Lambda\RuntimeApi\Http\HttpRequestInterface;
 use TopicAdvisor\Lambda\RuntimeApi\Http\HttpResponse;
 use TopicAdvisor\Lambda\RuntimeApi\InvocationRequestInterface;
 use TopicAdvisor\Lambda\RuntimeApi\InvocationResponseInterface;
-use TopicAdvisor\Lambda\Symfony\Handler\SymfonyHandler;
 
-class RequestHandler extends SymfonyHandler
+class RequestHandler extends AbstractHandler
 {
     /** @var HttpFoundationFactory */
     private $httpFoundationFactory;

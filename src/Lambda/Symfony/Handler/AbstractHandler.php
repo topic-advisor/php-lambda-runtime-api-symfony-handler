@@ -3,21 +3,21 @@
 namespace TopicAdvisor\Lambda\Symfony\Handler;
 
 use PHPPM\Bootstraps\Symfony;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use TopicAdvisor\Lambda\RuntimeApi\InvocationRequestHandlerInterface;
 use TopicAdvisor\Lambda\RuntimeApi\InvocationRequestInterface;
 use TopicAdvisor\Lambda\RuntimeApi\InvocationResponseInterface;
 
-abstract class SymfonyHandler implements InvocationRequestHandlerInterface
+abstract class AbstractHandler implements InvocationRequestHandlerInterface
 {
-    /**
-     * @var KernelInterface
-     */
+    /** @var KernelInterface */
     protected $kernel;
 
-    /**
-     * @var Symfony
-     */
+    /** @var ContainerInterface */
+    protected $container;
+
+    /** @var Symfony */
     private $symfony;
 
     /**
@@ -26,6 +26,7 @@ abstract class SymfonyHandler implements InvocationRequestHandlerInterface
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
+        $this->container = $kernel->getContainer();
         $this->symfony = new Symfony();
     }
 
@@ -46,5 +47,14 @@ abstract class SymfonyHandler implements InvocationRequestHandlerInterface
     public function postHandle(InvocationRequestInterface $request, InvocationResponseInterface $response)
     {
         $this->symfony->postHandle($this->kernel);
+    }
+
+    /**
+     * @param string $serviceName
+     * @return object
+     */
+    protected function get(string $serviceName)
+    {
+        return $this->container->get($serviceName);
     }
 }
