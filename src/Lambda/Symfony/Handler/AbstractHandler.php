@@ -2,8 +2,6 @@
 
 namespace TopicAdvisor\Lambda\Symfony\Handler;
 
-use PHPPM\Bootstraps\Symfony;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use TopicAdvisor\Lambda\RuntimeApi\InvocationRequestHandlerInterface;
 use TopicAdvisor\Lambda\RuntimeApi\InvocationRequestInterface;
@@ -14,20 +12,12 @@ abstract class AbstractHandler implements InvocationRequestHandlerInterface
     /** @var KernelInterface */
     protected $kernel;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /** @var Symfony */
-    private $symfony;
-
     /**
      * @param KernelInterface $kernel
      */
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel = $kernel;
-        $this->container = $kernel->getContainer();
-        $this->symfony = new Symfony();
     }
 
     /**
@@ -36,7 +26,7 @@ abstract class AbstractHandler implements InvocationRequestHandlerInterface
      */
     public function preHandle(InvocationRequestInterface $request)
     {
-        $this->symfony->preHandle($this->kernel);
+
     }
 
     /**
@@ -46,7 +36,9 @@ abstract class AbstractHandler implements InvocationRequestHandlerInterface
      */
     public function postHandle(InvocationRequestInterface $request, InvocationResponseInterface $response)
     {
-        $this->symfony->postHandle($this->kernel);
+        if ($this->kernel->getContainer()->has('services_resetter')) {
+	        $this->kernel->getContainer()->get('services_resetter')->reset();
+        }
     }
 
     /**
@@ -55,6 +47,6 @@ abstract class AbstractHandler implements InvocationRequestHandlerInterface
      */
     protected function get(string $serviceName)
     {
-        return $this->container->get($serviceName);
+        return $this->kernel->getContainer()->get($serviceName);
     }
 }
