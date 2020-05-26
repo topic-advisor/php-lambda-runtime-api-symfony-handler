@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\HttpKernel\TerminableInterface;
 use TopicAdvisor\Lambda\RuntimeApi\Http\HttpRequestInterface;
 use TopicAdvisor\Lambda\RuntimeApi\Http\HttpResponse;
 use TopicAdvisor\Lambda\RuntimeApi\InvocationRequestInterface;
@@ -58,10 +59,15 @@ class RequestHandler extends AbstractHandler
         $request = $this->httpFoundationFactory->createRequest($lambdaRequest);
         $request->server->set('LAMBDA_PAYLOAD', $lambdaRequest->getPayload());
         $symfonyResponse = $this->kernel->handle($request);
+
+	    if ($this->kernel instanceof TerminableInterface) {
+		    $this->kernel->terminate($request, $symfonyResponse);
+	    }
+	    
         return $this->toLambdaResponse($lambdaRequest, $symfonyResponse);
     }
 
-    /**
+	/**
      * @param HttpRequestInterface $lambdaRequest
      * @param Response $symfonyResponse
      * @return HttpResponse
